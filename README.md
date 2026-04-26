@@ -71,6 +71,7 @@ hipcc -std=c++17 -O3 -g --offload-arch=gfx942 optimized_transpose.cpp -o optimiz
 rocprofv3 --att --kernel-include-regex transposeNaive  --att-activity 10 -d ./unoptimized -- ./naive_transpose
 rocprofv3 --att --kernel-include-regex transposeTiled --att-activity 10 -d ./optimized  -- ./optimized_transpose
 ```
+See [`matrix_transpose/README.md`](matrix_transpose/README.md)
 
 ### 3. Depthwise Conv3D (`depthwise_conv3d/`)
 
@@ -81,15 +82,11 @@ export HIP_ARCH=gfx942   # match your GPU
 ./conv3d_depthwise_sgb 200 10
 ```
 
-See [`depthwise_conv3d/README.md`](depthwise_conv3d/README.md).
-
-**rocprofv3** (advanced thread trace, ATT — install `rocprof-trace-decoder` / `librocprof-trace-decoder.so` as in **ROCProfv3 Advanced Thread Trace (ATT)** above):
-
 ```bash
 rocprofv3 --att --kernel-include-regex '.*conv_depthwise3d_hip.*' --att-activity 10 -d ./trace_sgb -- ./conv3d_depthwise_sgb 5 2
 rocprofv3 --att --kernel-include-regex '.*conv_depthwise3d_hip.*' --att-activity 10 -d ./trace_orig -- ./conv3d_depthwise_original 5 2
 ```
-
+See [`depthwise_conv3d/README.md`](depthwise_conv3d/README.md).
 ## References
 
 - [ROCm documentation](https://rocm.docs.amd.com/)
