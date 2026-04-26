@@ -17,32 +17,35 @@ This repository collects small, self-contained **AMD GPU** workloads used to lea
 ## Rocprofling-sdk usage 
 
 ### ROCm Compute Profiler
+```bash
 pip install -r /opt/rocm/libexec/rocprofiler-compute/requirements.txt
+```
+```bash
 rocprof-compute profile -n mytest --no-roof -- target_app
 rocprof-compute analyze -p workloads/mytest/MI308X
 rocprof-compute analyze -p workloads/mytest/MI308X --gui
-
-### ROCProfv3 Basic Performance Analysis
 ```
+### ROCProfv3 Basic Performance Analysis
+```bash
 rocprofv3 --hip-trace --kernel-trace --output-format pftrace --summary -- target_app
 ```
 
 ### ROCProfv3 PMC Counter Analysis
-```
+```bash
 rocprofv3 --pmc SQ_LDS_BANK_CONFLICT,GRBM_COUNT,SQ_WAVES,TCC_HIT_sum,TCC_MISS_sum,TCP_TOTAL_ACCESSES --output-format csv  -- target_app
 ```
 ### ROCProfv3 Advanced Thread Trace (ATT)
-```
+```bash
 wget https://github.com/ROCm/rocprof-trace-decoder/releases/download/0.1.6/rocprof-trace-decoder-manylinux-2.28-0.1.6-Linux.sh
 bash ./rocprof-trace-decoder-manylinux-2.28-0.1.6-Linux.sh --skip-license --prefix=./
 cp ./opt/rocm/lib/librocprof-trace-decoder.so /opt/rocm/lib/
 ```
-```
+```bash
 rocprofv3 --att --kernel-include-regex kernel-name --att-activity 10 -d ./trace_results -- target_app
 ``` 
 
 ### ROCm Systems Profiler
-```
+```bash
 rocprof-sys-instrument -- target_app
 ```
 ## Examples
@@ -87,6 +90,7 @@ rocprofv3 --att --kernel-include-regex '.*conv_depthwise3d_hip.*' --att-activity
 rocprofv3 --att --kernel-include-regex '.*conv_depthwise3d_hip.*' --att-activity 10 -d ./trace_orig -- ./conv3d_depthwise_original 5 2
 ```
 See [`depthwise_conv3d/README.md`](depthwise_conv3d/README.md).
+
 ## References
 
 - [ROCm documentation](https://rocm.docs.amd.com/)
