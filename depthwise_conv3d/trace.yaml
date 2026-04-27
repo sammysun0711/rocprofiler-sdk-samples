@@ -1,7 +1,7 @@
 jobs:
     -
         kernel_include_regex: (.*conv_depthwise3d_hip*)
-        kernel_iteration_range: "[1, [3-4]]"
+        kernel_iteration_range: "[1]"
         output_file: out
         output_directory: conv3d_depthwise_sgb_trace
         output_format: [pftrace]

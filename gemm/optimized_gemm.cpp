@@ -298,10 +298,10 @@ int main(int argc, char** argv) {
     HIP_API_CALL(hipDeviceSynchronize());
     
     // Timed runs - directly call kernel
-    printf("Running benchmark (100 iterations)...\n");
+    printf("Running benchmark (10 iterations)...\n");
     auto start = std::chrono::high_resolution_clock::now();
     
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 10; i++) {
         fp8_gemm_kernel<<<grid, block>>>(d_A, d_B, d_C, d_scale_a, d_scale_b, M, N, K);
     }
     

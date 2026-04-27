@@ -25,6 +25,12 @@ rocprof-compute profile -n mytest --no-roof -- target_app
 rocprof-compute analyze -p workloads/mytest/MI308X
 rocprof-compute analyze -p workloads/mytest/MI308X --gui
 ```
+
+Please note, if we choose roofline analysis, we should choose same --roofline-data-type as workload used,
+e.g. For FP8 Gemm kernel, use --roofline-data-type FP8 for roofline analysis
+```bash
+rocprof-compute analyze -p workloads/mytest/MI308X --roofline-data-type FP8 --gui
+```
 ### ROCProfv3 Basic Performance Analysis
 ```bash
 rocprofv3 --hip-trace --kernel-trace --output-format pftrace --summary -- target_app
@@ -40,9 +46,10 @@ wget https://github.com/ROCm/rocprof-trace-decoder/releases/download/0.1.6/rocpr
 bash ./rocprof-trace-decoder-manylinux-2.28-0.1.6-Linux.sh --skip-license --prefix=./
 cp ./opt/rocm/lib/librocprof-trace-decoder.so /opt/rocm/lib/
 ```
+
 ```bash
-rocprofv3 --att --kernel-include-regex kernel-name --att-activity 10 -d ./trace_results -- target_app
-``` 
+rocprofv3 -i gemm/trace.yaml -- target_app
+```
 
 ### ROCm Systems Profiler
 ```bash

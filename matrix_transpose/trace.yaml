@@ -1,9 +1,9 @@
 jobs:
     -
         kernel_include_regex: (.*transpose*)
-        kernel_iteration_range: "[1, [3-4]]"
+        kernel_iteration_range: "[1]"
         output_file: out
-        output_directory: opt_transpose_profile_att_activity_perfcounter_ctrl_new
+        output_directory: optimized_transpose_trace
         output_format: [pftrace]
         truncate_kernels: true
         sys_trace: true # enable for pftrace and otf2

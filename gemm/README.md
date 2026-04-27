@@ -191,7 +191,7 @@ Reuse factor: ~32x (64 elements reused across 64 output computations)
 
 # Build and run with custom matrix dimensions
 ./build_run.sh <M> <N> <K>
-./build_run.sh 2048 2048 2048
+./build_run.sh 1024 1024 1024
 ```
 
 The script will:
