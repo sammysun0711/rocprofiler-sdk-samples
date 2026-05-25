@@ -27,7 +27,11 @@ using namespace std;
     }
 
 using float16 = __hip_bfloat16;
+#if defined(__gfx950__)
+using float8  = __hip_fp8_e4m3;
+#else
 using float8  = __hip_fp8_e4m3_fnuz;
+#endif
 
 // Naive FP8 GEMM kernel - straightforward implementation without optimizations
 // No MFMA, no shared memory, no tiling - just simple computation

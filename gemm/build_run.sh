@@ -17,7 +17,7 @@ CXX=hipcc
 
 # Try to auto-detect GPU architecture, otherwise use default
 if command -v /opt/rocm/bin/rocminfo &> /dev/null; then
-    GPU_ARCH=$(/opt/rocm/bin/rocminfo 2>/dev/null | grep -m1 "Name:" | grep -oP "gfx\w+" || echo "gfx942")
+    GPU_ARCH=$(/opt/rocm/bin/rocminfo 2>/dev/null | grep "Name:" | grep -oP "gfx\w+" | head -1)
 else
     GPU_ARCH="gfx942"  # Default to MI300
 fi
