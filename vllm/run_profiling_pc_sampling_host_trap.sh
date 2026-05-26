@@ -8,10 +8,11 @@ if [ -z "$PID" ]; then
 fi
 echo "Attaching to VLLM::Worker_TP PID=$PID"
 
-rocprofv3 --attach $PID \
-        --pc-sampling-beta-enabled \
-        --pc-sampling-method  host_trap \
-        --pc-sampling-unit time \
-        --pc-sampling-interval 1000 \
-        --output-format csv 2>&1 | tee pc_sampling_host_trap.log
-
+rocprofv3 --attach $PID                        \
+          --pc-sampling-beta-enabled           \
+          --pc-sampling-method  host_trap      \
+          --pc-sampling-unit time              \
+          --pc-sampling-interval 1000          \
+          --output-format csv                  \
+          -d rocprofile_pc_sampling_host_trap  \
+          2>&1 | tee pc_sampling_host_trap.log

@@ -8,9 +8,10 @@ if [ -z "$PID" ]; then
 fi
 echo "Attaching to VLLM::Worker_TP PID=$PID"
 
-rocprofv3 --attach "$PID"  \
-    --hip-trace \
-    --sys-trace \
-    --attach-duration-msec 5000 \
-    --output-format pftrace \
-    -o out 2>&1 | tee rocprofv3.log
+rocprofv3 --attach $PID                \
+          --hip-trace                  \
+          --sys-trace                  \
+          --attach-duration-msec 5000  \
+          --output-format csv          \
+          -d rocprofile_dynamic_attach \
+          2>&1 | tee rocprofv3.log

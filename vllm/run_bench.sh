@@ -9,4 +9,4 @@ vllm bench serve  \
      --port 20010 \
      --max-concurrency 10 2>&1 | tee vllm_bench.log
 
-dmesg 2>&1 | tee dmesg.log
+#dmesg 2>&1 | tee dmesg.log
