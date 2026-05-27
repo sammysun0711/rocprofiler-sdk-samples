@@ -14,14 +14,16 @@ ls /opt/rocm/lib | grep rccl
 
 ```
 export PATH=$PATH:/opt/rocm/bin
-cd rcc-tests
-make clean && make
+# in this folder
+cmake -S . -B build -DGPU_TARGETS=gfx950
+cmake --build build
 ```
 
 3. Run basic tests
 
 for example
 ```
+cd build
 ./all_reduce_perf -b 1G -e 1G -f 2 -g 8 -n 1 -w 0
 ``` 
 - b	1G	Begin message size = 1 GB
