@@ -33,7 +33,7 @@ cd build
 - n	1	Run 1 measured iteration
 - w	0	No warmup iterations
 
-you can regulate the command line.
+The command-line options can be configured as needed. For a comprehensive description of these arguments, please refer to  [source of rccl-tests](https://github.com/ROCm/rocm-systems/tree/develop/projects/rccl-tests).
 
 4. Run profile
 
