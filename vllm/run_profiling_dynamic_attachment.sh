@@ -12,6 +12,6 @@ rocprofv3 --attach $PID                \
           --hip-trace                  \
           --sys-trace                  \
           --attach-duration-msec 5000  \
-          --output-format csv          \
+          --output-format pftrace      \
           -d rocprofile_dynamic_attach \
           2>&1 | tee rocprofv3.log

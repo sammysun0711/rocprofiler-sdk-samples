@@ -3,7 +3,7 @@ export ROCP_TOOL_ATTACH=1
 export HIP_VISIBLE_DEVICES=6,7
 export VLLM_ROCM_USE_AITER=1
 
-vllm serve /models/Qwen3-0.6B \
+vllm serve Qwen/Qwen3-0.6B \
     --gpu-memory-utilization=0.7 \
     --port=20010 \
     --tensor-parallel-size 2 \

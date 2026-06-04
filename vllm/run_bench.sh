@@ -1,6 +1,6 @@
 vllm bench serve  \
      --backend vllm  \
-     --model /models/Qwen3-0.6B  \
+     --model Qwen/Qwen3-0.6B  \
      --trust-remote-code \
      --endpoint /v1/completions  \
      --dataset-name sharegpt \
