@@ -1,0 +1,116 @@
+FROM ubuntu:22.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG ROCM_NIGHTLY_URL=https://rocm.nightlies.amd.com/v2/gfx950-dcgpu/
+ARG ROCM_VERSION=7.13.0a20260414
+ARG PYTORCH_ROCM_ARCH=gfx950
+ARG GPU_ARCHS=gfx950
+ARG PYTHON_VERSION=3.12
+ARG VLLM_BRANCH=releases/v0.19.0
+ARG AITER_BRANCH=v0.1.10.post2
+
+ARG TORCH_VERSION=2.10.0+rocm${ROCM_VERSION}
+ARG TORCHVISION_VERSION=0.25.0+rocm${ROCM_VERSION}
+ARG TORCHAUDIO_VERSION=2.10.0+rocm${ROCM_VERSION}
+ARG TRITON_VERSION=3.6.0+rocm${ROCM_VERSION}
+
+ENV PYTORCH_ROCM_ARCH=${PYTORCH_ROCM_ARCH}
+ENV GPU_ARCHS=${GPU_ARCHS}
+
+# ==============================================================================
+# System dependencies
+# ==============================================================================
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        python3-dev \
+        curl \
+        vim \
+        git \
+        cmake \
+        wget \
+        pkg-config \
+        libdrm-dev \
+        build-essential \
+        libatomic1 \
+        libgomp1 \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# ==============================================================================
+# Install uv and create Python 3.12 venv
+# ==============================================================================
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:${PATH}"
+
+RUN uv venv /opt/venv --python ${PYTHON_VERSION} --seed
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="/opt/venv/bin:${PATH}"
+
+# ==============================================================================
+# Install ROCm 7.13 nightly (0414) SDK
+# ==============================================================================
+RUN pip install -U pip && \
+    python3 -m pip install --index-url ${ROCM_NIGHTLY_URL} \
+        "rocm[libraries,devel]==${ROCM_VERSION}"
+
+# Set ROCm environment paths
+ENV CMAKE_PREFIX_PATH="$(rocm-sdk path --cmake)"
+ENV ROCM_PATH="/opt/venv/lib/python3.12/site-packages/_rocm_sdk_devel"
+ENV PATH="${ROCM_PATH}/bin:${PATH}"
+ENV LD_LIBRARY_PATH="${ROCM_PATH}/lib:${LD_LIBRARY_PATH}"
+
+# Use a shell wrapper to resolve rocm-sdk paths at build time
+RUN echo 'export CMAKE_PREFIX_PATH=$(rocm-sdk path --cmake)' >> /etc/profile.d/rocm.sh && \
+    echo 'export PATH=$(rocm-sdk path --bin):$PATH' >> /etc/profile.d/rocm.sh && \
+    echo 'export LD_LIBRARY_PATH=$(rocm-sdk path --root)/lib:$LD_LIBRARY_PATH' >> /etc/profile.d/rocm.sh && \
+    echo 'export ROCM_PATH=$(rocm-sdk path --root)' >> /etc/profile.d/rocm.sh
+
+# ==============================================================================
+# Install PyTorch + Triton (ROCm nightly)
+# ==============================================================================
+RUN python3 -m pip install --index-url ${ROCM_NIGHTLY_URL} \
+        torch==${TORCH_VERSION} \
+        torchvision==${TORCHVISION_VERSION} \
+        torchaudio==${TORCHAUDIO_VERSION} \
+        triton==${TRITON_VERSION}
+
+# ==============================================================================
+# Install amdsmi
+# ==============================================================================
+RUN AMD_SMI_DIR=$(find /opt/venv -path '*/amd_smi/setup.py' -exec dirname {} \; 2>/dev/null | head -1) && \
+    if [ -n "$AMD_SMI_DIR" ]; then \
+        pip install "$AMD_SMI_DIR"; \
+    else \
+        pip install --index-url ${ROCM_NIGHTLY_URL} amdsmi || pip install amdsmi; \
+    fi
+
+# ==============================================================================
+# Build & install vLLM v0.19.0
+# ==============================================================================
+RUN pip install pytest && \
+    pip uninstall -y cuda-pathfinder cupy-cuda12x 2>/dev/null; true
+
+RUN git clone https://github.com/vllm-project/vllm -b ${VLLM_BRANCH} /opt/vllm
+WORKDIR /opt/vllm
+
+SHELL ["/bin/bash", "-c"]
+RUN source /etc/profile.d/rocm.sh && \
+    pip install -r requirements/rocm.txt && \
+    pip install cmake==3.26 && \
+    VLLM_TARGET_DEVICE=rocm PYTORCH_ROCM_ARCH=${PYTORCH_ROCM_ARCH} pip install --no-build-isolation .
+
+# ==============================================================================
+# Build & install aiter v0.1.10.post2
+# ==============================================================================
+RUN git clone https://github.com/ROCm/aiter.git -b ${AITER_BRANCH} /opt/aiter
+WORKDIR /opt/aiter
+
+RUN source /etc/profile.d/rocm.sh && \
+    git submodule update --init --recursive && \
+    PYTORCH_ROCM_ARCH=${PYTORCH_ROCM_ARCH} GPU_ARCHS=${GPU_ARCHS} pip install .
+
+# ==============================================================================
+# Cleanup
+# ==============================================================================
+RUN rm -rf ~/.cache/pip/* /tmp/*
+
+WORKDIR /opt
